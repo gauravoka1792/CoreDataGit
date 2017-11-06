@@ -7,6 +7,9 @@
 //
 
 import UIKit
+import FBSDKLoginKit
+import FacebookCore
+import CoreData
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -15,8 +18,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
-        return true
+        
+        
+//        self.window = UIWindow(frame: UIScreen.main.bounds)
+//        let viewcon = ViewController(nibName: nil, bundle: nil) //ViewController = Name of your controller
+//        let navcon = UINavigationController(rootViewController: viewcon)
+//        self.window!.rootViewController = navcon
+//        self.window?.makeKeyAndVisible()
+     
+        return FBSDKApplicationDelegate.sharedInstance().application(application,didFinishLaunchingWithOptions: launchOptions)
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
@@ -40,7 +50,43 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
+    
+    func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
+        return FBSDKApplicationDelegate.sharedInstance().application(application, open: url, sourceApplication: sourceApplication, annotation: annotation)
+    }
+    
+    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+        return SDKApplicationDelegate.shared.application(app, open: url, options: options)
+    }
+    
+    //Mark - Core Data
+    
+    lazy var persistentContainer : NSPersistentContainer = {
+        let container = NSPersistentContainer(name:"Model")
+        container.loadPersistentStores(completionHandler: {(storeDescription,error)in
+            if let error = error as NSError?{
+                fatalError("unresolved Error \(error),\(error.userInfo)")
+            }
+        })
+        
+        return container
+    }()
 
+    //Mark - Core Data Saving Support
+    
+    func saveContext () {
+        let context =  persistentContainer.viewContext
+        if context.hasChanges {
+            do{
+                try context.save()
+            }
+            catch
+            {
+                let nserror = error as NSError
+                fatalError("unresolved error \(nserror), \(nserror.userInfo)")
+            }
+        }
+    }
 
 }
 
