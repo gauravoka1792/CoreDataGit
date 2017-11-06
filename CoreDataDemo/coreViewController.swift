@@ -64,6 +64,8 @@ class coreViewController: UIViewController, classfbDelegate {
 //        }
         
         
+        
+        
         fetchData()
         
        // updateData()
